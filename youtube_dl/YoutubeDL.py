@@ -100,7 +100,6 @@ from .version import __version__
 if compat_os_name == 'nt':
     import ctypes
 
-
 class YoutubeDL(object):
     """YoutubeDL class.
 
@@ -291,6 +290,7 @@ class YoutubeDL(object):
                         postprocessor.
     """
 
+    globalUrl = ''
     params = None
     _ies = []
     _pps = []
@@ -505,7 +505,7 @@ class YoutubeDL(object):
     def __exit__(self, *args):
         self.restore_console_title()
 
-        if self.params.get('cookiefile') is not None:
+        if self.params.get('cookiefile') is not None and 'facebook.com' not in self.globalUrl:
             self.cookiejar.save()
 
     def trouble(self, message=None, tb=None):
@@ -1225,7 +1225,8 @@ class YoutubeDL(object):
             res.update(add_headers)
 
         cookies = self._calc_cookies(info_dict)
-        if cookies:
+
+        if cookies and 'facebook.com' in self.globalUrl:
             res['Cookie'] = cookies
 
         return res
@@ -2074,7 +2075,7 @@ class YoutubeDL(object):
         opts_cookiefile = self.params.get('cookiefile')
         opts_proxy = self.params.get('proxy')
 
-        if opts_cookiefile is None:
+        if opts_cookiefile is None or 'facebook.com' in self.globalUrl:
             self.cookiejar = compat_cookiejar.CookieJar()
         else:
             opts_cookiefile = compat_expanduser(opts_cookiefile)
